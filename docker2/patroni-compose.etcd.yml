@@ -1,0 +1,66 @@
+# docker compose file for running a 3-node PostgreSQL cluster
+# with etcd as the SIS
+
+etcd:
+    image: quay.io/coreos/etcd
+    
+dbnode1: 
+    image: jberkus/patroni-db-94
+    hostname: dbnode1
+    ports: 
+        - "5432"
+        - "4001"
+    links: 
+        - etcd
+    volumes: 
+        - docker2/etc/wal-e.d:/etc/wal-e.d
+    env-file:
+        - docker2/patroni-secrets.env
+    environment:
+        NODE: dbnode1
+        CLUSTER: testcluster 
+        
+dbnode2: 
+    image: jberkus/patroni-db-94
+    hostname: dbnode2
+    ports: 
+        - "5432"
+        - "4001"
+    links: 
+        - etcd
+    volumes: 
+        - docker2/etc/wal-e.d:/etc/wal-e.d
+    env-file:
+        - docker2/patroni-secrets.env
+    environment:
+        NODE: dbnode2
+        CLUSTER: testcluster
+        
+dbnode3: 
+    image: jberkus/patroni-db-94
+    hostname: dbnode3
+    ports: 
+        - "5432"
+        - "4001"
+    links: 
+        - etcd
+    volumes: 
+        - docker2/etc/wal-e.d:/etc/wal-e.d
+    env-file:
+        - docker2/patroni-secrets.env
+    environment:
+        NODE: dbnode2
+        CLUSTER: testcluster
+        
+haproxy:
+    image: haproxy
+    volumes:
+        - docker2/etc/haproxy:/usr/local/etc/haproxy
+    links:
+        - dbnode1
+        - dbnode2
+        - dbnode3
+    ports:
+        - "15432"
+        - "15433"
+        
