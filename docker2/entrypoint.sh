@@ -16,7 +16,7 @@ restapi:
 etcd:
   scope: *scope
   ttl: *ttl
-  host: 127.0.0.1:4001
+  host: etcd:2379
 postgresql:
   name: ${NODE}
   scope: *scope
@@ -34,7 +34,7 @@ postgresql:
     network:  ${DOCKER_IP}/32
   superuser:
     password: ${SUPERPASS}
-  restore: patroni/scripts/restore.py
+  restore: /patroni/scripts/basebackup.py
   admin:
     username: ${ADMINUSER}
     password: ${ADMINPASS}
@@ -43,21 +43,24 @@ postgresql:
     archive_command: mkdir -p ../wal_archive && cp %p ../wal_archive/%f
     wal_level: hot_standby
     max_wal_senders: 7
-    hot_standby = "on"
+    hot_standby: "on"
+    listen_addr: "*"
 __EOF__
 
-if [ "${PGVERSION}" -eq "9.3" ]
+if [ "${PGVERSION}" = "9.3" ]
 then
     cat >> /etc/patroni/patroni.yml <<__EOF__
-    wal_keep_segments = 10
+    wal_keep_segments: 10
 __EOF__
 else
     cat >> /etc/patroni/patroni.yml <<__EOF__
-    max_replication_slots = 7
+    max_replication_slots: 7
 __EOF__
 fi
 
-cat /etc/patroni/postgres.yml
+sleep 2
+
+cat /etc/patroni/patroni.yml
 
 exec patroni /etc/patroni/patroni.yml
 

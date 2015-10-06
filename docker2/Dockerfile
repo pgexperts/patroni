@@ -6,13 +6,11 @@ FROM ubuntu:trusty
 
 ADD . /setup/
 
-RUN /setup/docker2/package_install.sh 9.3
+RUN /setup/docker2/package_install.sh 9.4
 
 RUN /setup/docker2/file_setup.sh
 
 EXPOSE 8001 5432
 
-ENTRYPOINT
-
-ENTRYPOINT ["/bin/bash", "/setup/docker2/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash"]
 USER postgres

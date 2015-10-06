@@ -2,11 +2,12 @@
 
 mkdir /pgdata/
 mkdir /pgdata/data
-chown postgres:postgres /pgdata/data/
-chmod 700 /pgdata 
+chown -R postgres:postgres /pgdata/
+chmod -R 700 /pgdata 
 
-mkdir /etc/patroni/
-chown postgres:postgres /etc/patroni
+mkdir /etc/patroni
+mkdir /etc/patroni/conf.d
+chown -R postgres:postgres /etc/patroni
 
 mkdir /etc/wal-e.d/
 
